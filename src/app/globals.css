@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ivory: #FAF7F2;
+  --color-ink: #2C2625;
+  --color-petal: #F5E5E8;
+  --color-blush: #FADDE1;
+  --color-sand: #F3ECE4;
+  --color-warm: #EFE6DD;
+  --color-stone: #6B6260;
+  --color-rose-deep: #B4606E;
+  --color-rose-muted: #9E5B66;
+  --font-display: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+  --font-body: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: var(--color-ivory);
+    color: var(--color-ink);
+  }
+}
