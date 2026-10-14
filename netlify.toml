@@ -1,17 +1,18 @@
-# Divine Empress Hair — Netlify deployment config
+# Divine Empress Hair - Netlify deployment config
 # Netlify auto-detects Next.js (App Router) and uses the Next.js Runtime
 # for SSR, API routes (/api/*), and image optimization.
 
 [build]
   command = "npm run build"
   publish = ".next"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+  SECRETS_SCAN_OMIT_PATHS = "path/to/file"
 
 [build.environment]
   NODE_VERSION = "20"
   NPM_FLAGS = "--no-audit --no-fund"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
 
 # Cache Next.js build output for faster deploys
 [[headers]]
@@ -26,9 +27,8 @@
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-[build]
-  SECRETS_SCAN_OMIT_PATHS = "path/to/file"
