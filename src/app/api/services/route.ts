@@ -127,7 +127,7 @@ export async function POST(req: Request) {
     price = String(price).trim();
 
     // Standardize price if user just typed a number like "450"
-    if (!price.toUpperCase().startsWith("R") && !price.startsWith("$") && !price.startsWith("£")) {
+    if (!price.toUpperCase().startsWith("R") && !price.startsWith("\$") && !price.startsWith("£")) {
       price = `R${price}`;
     }
 
@@ -184,5 +184,58 @@ export async function POST(req: Request) {
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Error adding service";
     return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+export async function PUT(req: Request) {
+  try {
+    const session = await getAdminSessionFromRequest(req);
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized. Please log in as Storm." }, { status: 401 });
+    }
+
+    const body = await req.json();
+    let { id, name, price } = body; 
+
+    if (!id) {
+      return NextResponse.json({ error: "Missing required Service ID." }, { status: 400 });
+    }
+
+    const { eq } = await import("drizzle-orm");
+
+    // Standardize price format to preserve the currency symbol prefix structure
+    if (price) {
+      price = String(price).trim();
+      if (!price.toUpperCase().startsWith("R") && !price.startsWith("\$") && !price.startsWith("£")) {
+        price = `R${price}`;
+      }
+    }
+
+    // Update query mapping to supply all four context parameters (\$1, \$2, \$3, \$4)
+    const [updated] = await db
+      .update(services)
+      .set({
+        name: name ? String(name).trim() : undefined,
+        price: price,
+        updatedAt: new Date(), 
+      })
+      .where(eq(services.id, Number(id)))
+      .returning();
+
+    if (!updated) {
+      return NextResponse.json({ error: "Service not found." }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      service: updated,
+      message: `Successfully updated service entry`,
+    });
+  } catch (err: unknown) {
+    console.error("PUT /api/services error:", err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Error updating service" },
+      { status: 500 }
+    );
   }
 }
